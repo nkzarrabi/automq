@@ -17,6 +17,7 @@
 
 package org.apache.kafka.common.security.oauthbearer.internals.secured;
 
+import java.nio.file.Files;
 import org.apache.kafka.common.config.AbstractConfig;
 import org.apache.kafka.common.config.ConfigDef;
 import org.apache.kafka.common.security.auth.AuthenticateCallbackHandler;
@@ -166,7 +167,7 @@ public abstract class OAuthBearerTest {
         String suffix,
         String contents)
         throws IOException {
-        File file = File.createTempFile(prefix, suffix, tmpDir);
+        File file = Files.createTempFile(tmpDir.toPath(), prefix, suffix).toFile();
         log.debug("Created new temp file {}", file);
         file.deleteOnExit();
 
