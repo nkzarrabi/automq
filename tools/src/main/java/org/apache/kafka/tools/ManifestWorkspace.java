@@ -16,6 +16,7 @@
  */
 package org.apache.kafka.tools;
 
+import io.github.pixee.security.BoundedLineReader;
 import org.apache.kafka.common.utils.AppInfoParser;
 import org.apache.kafka.connect.runtime.isolation.PluginSource;
 import org.apache.kafka.connect.runtime.isolation.PluginType;
@@ -577,7 +578,7 @@ public class ManifestWorkspace {
 
     // Based on implementation from ServiceLoader.LazyClassPathLookupIterator from OpenJDK11
     private static int parseLine(URL u, BufferedReader r, int lc, Set<String> names) throws IOException {
-        String ln = r.readLine();
+        String ln = BoundedLineReader.readLine(r, 5_000_000);
         if (ln == null) {
             return -1;
         }

@@ -16,6 +16,7 @@
  */
 package org.apache.kafka.raft;
 
+import io.github.pixee.security.BoundedLineReader;
 import org.apache.kafka.common.utils.Utils;
 import org.apache.kafka.raft.generated.QuorumStateData;
 import org.apache.kafka.raft.generated.QuorumStateDataJsonConverter;
@@ -87,7 +88,7 @@ public class FileQuorumStateStore implements QuorumStateStore {
 
     private QuorumStateData readStateFromFile(File file) {
         try (final BufferedReader reader = Files.newBufferedReader(file.toPath(), StandardCharsets.UTF_8)) {
-            final String line = reader.readLine();
+            final String line = BoundedLineReader.readLine(reader, 5_000_000);
             if (line == null) {
                 throw new EOFException("File ended prematurely.");
             }

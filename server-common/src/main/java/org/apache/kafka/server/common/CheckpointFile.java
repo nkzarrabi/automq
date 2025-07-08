@@ -16,6 +16,7 @@
  */
 package org.apache.kafka.server.common;
 
+import io.github.pixee.security.BoundedLineReader;
 import org.apache.kafka.common.utils.Utils;
 
 import java.io.BufferedReader;
@@ -144,7 +145,7 @@ public class CheckpointFile<T> {
         }
 
         public List<T> read() throws IOException {
-            String line = reader.readLine();
+            String line = BoundedLineReader.readLine(reader, 5_000_000);
             if (line == null)
                 return Collections.emptyList();
 
@@ -154,20 +155,20 @@ public class CheckpointFile<T> {
                                               + " in checkpoint file at: " + location);
             }
 
-            line = reader.readLine();
+            line = BoundedLineReader.readLine(reader, 5_000_000);
             if (line == null) {
                 return Collections.emptyList();
             }
             int expectedSize = toInt(line);
             List<T> entries = new ArrayList<>(expectedSize);
-            line = reader.readLine();
+            line = BoundedLineReader.readLine(reader, 5_000_000);
             while (line != null) {
                 Optional<T> maybeEntry = formatter.fromString(line);
                 if (!maybeEntry.isPresent()) {
                     throw buildMalformedLineException(line);
                 }
                 entries.add(maybeEntry.get());
-                line = reader.readLine();
+                line = BoundedLineReader.readLine(reader, 5_000_000);
             }
 
             if (entries.size() != expectedSize) {

@@ -17,6 +17,7 @@
 
 package org.apache.kafka.trogdor.workload;
 
+import io.github.pixee.security.BoundedLineReader;
 import org.apache.kafka.common.internals.KafkaFutureImpl;
 import org.apache.kafka.common.utils.ThreadUtils;
 import org.apache.kafka.trogdor.common.JsonUtil;
@@ -197,7 +198,7 @@ public class ExternalCommandWorker implements TaskWorker {
                 String line;
                 while (true) {
                     try {
-                        line = br.readLine();
+                        line = BoundedLineReader.readLine(br, 5_000_000);
                         if (line == null) {
                             throw new IOException("EOF");
                         }
@@ -241,7 +242,7 @@ public class ExternalCommandWorker implements TaskWorker {
                 String line;
                 while (true) {
                     try {
-                        line = br.readLine();
+                        line = BoundedLineReader.readLine(br, 5_000_000);
                         if (line == null) {
                             throw new IOException("EOF");
                         }

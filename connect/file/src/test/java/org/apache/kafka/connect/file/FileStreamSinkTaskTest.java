@@ -16,6 +16,7 @@
  */
 package org.apache.kafka.connect.file;
 
+import io.github.pixee.security.BoundedLineReader;
 import org.apache.kafka.clients.consumer.OffsetAndMetadata;
 import org.apache.kafka.common.TopicPartition;
 import org.apache.kafka.connect.data.Schema;
@@ -98,7 +99,7 @@ public class FileStreamSinkTaskTest {
         String[] lines = new String[numLines];
         int i = 0;
         try (BufferedReader reader = Files.newBufferedReader(Paths.get(outputFile))) {
-            lines[i++] = reader.readLine();
+            lines[i++] = BoundedLineReader.readLine(reader, 5_000_000);
             task.put(Arrays.asList(
                     new SinkRecord("topic1", 0, null, null, Schema.STRING_SCHEMA, "line1", 2),
                     new SinkRecord("topic2", 0, null, null, Schema.STRING_SCHEMA, "line2", 1)
@@ -106,8 +107,8 @@ public class FileStreamSinkTaskTest {
             offsets.put(new TopicPartition("topic1", 0), new OffsetAndMetadata(2L));
             offsets.put(new TopicPartition("topic2", 0), new OffsetAndMetadata(1L));
             task.flush(offsets);
-            lines[i++] = reader.readLine();
-            lines[i++] = reader.readLine();
+            lines[i++] = BoundedLineReader.readLine(reader, 5_000_000);
+            lines[i++] = BoundedLineReader.readLine(reader, 5_000_000);
         }
 
         while (--i >= 0) {

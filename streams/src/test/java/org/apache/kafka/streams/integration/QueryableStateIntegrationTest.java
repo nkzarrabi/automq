@@ -16,6 +16,7 @@
  */
 package org.apache.kafka.streams.integration;
 
+import io.github.pixee.security.BoundedLineReader;
 import org.apache.kafka.clients.consumer.ConsumerConfig;
 import org.apache.kafka.clients.producer.KafkaProducer;
 import org.apache.kafka.clients.producer.ProducerConfig;
@@ -188,7 +189,7 @@ public class QueryableStateIntegrationTest {
         try (final BufferedReader reader = new BufferedReader(
             new FileReader(Objects.requireNonNull(classLoader.getResource(fileName)).getFile()))) {
 
-            for (String line = reader.readLine(); line != null; line = reader.readLine()) {
+            for (String line = BoundedLineReader.readLine(reader, 5_000_000); line != null; line = BoundedLineReader.readLine(reader, 5_000_000)) {
                 input.add(line);
             }
         } catch (final Exception e) {
@@ -429,10 +430,10 @@ public class QueryableStateIntegrationTest {
 
                 exception.printStackTrace(new PrintStream(baos));
                 try (final BufferedReader reader = new BufferedReader(new StringReader(baos.toString()))) {
-                    String line = reader.readLine();
+                    String line = BoundedLineReader.readLine(reader, 5_000_000);
                     while (line != null) {
                         reason.append("\n            ").append(line);
-                        line = reader.readLine();
+                        line = BoundedLineReader.readLine(reader, 5_000_000);
                     }
                 }
             }

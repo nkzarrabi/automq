@@ -16,6 +16,7 @@
  */
 package org.apache.kafka.tools;
 
+import io.github.pixee.security.BoundedLineReader;
 import org.apache.kafka.clients.admin.AbortTransactionResult;
 import org.apache.kafka.clients.admin.AbortTransactionSpec;
 import org.apache.kafka.clients.admin.Admin;
@@ -1049,7 +1050,7 @@ public class TransactionsCommandTest {
     }
 
     private List<String> readRow(BufferedReader reader) throws IOException {
-        String line = reader.readLine();
+        String line = BoundedLineReader.readLine(reader, 5_000_000);
         if (line == null) {
             return null;
         } else {

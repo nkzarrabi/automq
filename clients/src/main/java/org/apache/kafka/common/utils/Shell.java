@@ -16,6 +16,7 @@
  */
 package org.apache.kafka.common.utils;
 
+import io.github.pixee.security.BoundedLineReader;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -99,11 +100,11 @@ public abstract class Shell {
         // free the error stream buffer
         Thread errThread = KafkaThread.nonDaemon("kafka-shell-thread", () -> {
             try {
-                String line = errReader.readLine();
+                String line = BoundedLineReader.readLine(errReader, 5_000_000);
                 while ((line != null) && !Thread.currentThread().isInterrupted()) {
                     errMsg.append(line);
                     errMsg.append(System.lineSeparator());
-                    line = errReader.readLine();
+                    line = BoundedLineReader.readLine(errReader, 5_000_000);
                 }
             } catch (IOException ioe) {
                 LOG.warn("Error reading the error stream", ioe);

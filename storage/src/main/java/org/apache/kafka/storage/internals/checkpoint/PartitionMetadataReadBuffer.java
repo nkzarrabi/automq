@@ -17,6 +17,7 @@
 
 package org.apache.kafka.storage.internals.checkpoint;
 
+import io.github.pixee.security.BoundedLineReader;
 import org.apache.kafka.common.Uuid;
 
 import java.io.BufferedReader;
@@ -42,14 +43,14 @@ public class PartitionMetadataReadBuffer {
         Uuid metadataTopicId;
 
         try {
-            line = reader.readLine();
+            line = BoundedLineReader.readLine(reader, 5_000_000);
             String[] versionArr = WHITE_SPACES_PATTERN.split(line);
 
             if (versionArr.length == 2) {
                 int version = Integer.parseInt(versionArr[1]);
                 // To ensure downgrade compatibility, check if version is at least 0
                 if (version >= PartitionMetadataFile.CURRENT_VERSION) {
-                    line = reader.readLine();
+                    line = BoundedLineReader.readLine(reader, 5_000_000);
                     String[] topicIdArr = WHITE_SPACES_PATTERN.split(line);
 
                     if (topicIdArr.length == 2) {

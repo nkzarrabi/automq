@@ -16,6 +16,7 @@
  */
 package org.apache.kafka.streams.state.internals;
 
+import io.github.pixee.security.BoundedLineReader;
 import org.apache.kafka.common.TopicPartition;
 import org.apache.kafka.common.utils.Utils;
 
@@ -155,7 +156,7 @@ public class OffsetCheckpoint {
                     case 0:
                         int expectedSize = readInt(reader);
                         final Map<TopicPartition, Long> offsets = new HashMap<>();
-                        String line = reader.readLine();
+                        String line = BoundedLineReader.readLine(reader, 5_000_000);
                         while (line != null) {
                             final String[] pieces = WHITESPACE_MINIMUM_ONCE.split(line);
                             if (pieces.length != 3) {
@@ -174,7 +175,7 @@ public class OffsetCheckpoint {
                                 --expectedSize;
                             }
 
-                            line = reader.readLine();
+                            line = BoundedLineReader.readLine(reader, 5_000_000);
                         }
                         if (offsets.size() != expectedSize) {
                             throw new IOException(
@@ -195,7 +196,7 @@ public class OffsetCheckpoint {
      * @throws IOException if file read ended prematurely
      */
     private int readInt(final BufferedReader reader) throws IOException {
-        final String line = reader.readLine();
+        final String line = BoundedLineReader.readLine(reader, 5_000_000);
         if (line == null) {
             throw new EOFException("File ended prematurely.");
         }
