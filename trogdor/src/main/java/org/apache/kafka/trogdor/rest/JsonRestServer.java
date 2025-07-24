@@ -17,6 +17,8 @@
 
 package org.apache.kafka.trogdor.rest;
 
+import io.github.pixee.security.HostValidator;
+import io.github.pixee.security.Urls;
 import org.apache.kafka.common.utils.ThreadUtils;
 import org.apache.kafka.trogdor.common.JsonUtil;
 
@@ -182,7 +184,7 @@ public class JsonRestServer {
             String serializedBody = requestBodyData == null ? null :
                 JsonUtil.JSON_SERDE.writeValueAsString(requestBodyData);
             logger.debug("Sending {} with input {} to {}", method, serializedBody, url);
-            connection = (HttpURLConnection) new URL(url).openConnection();
+            connection = (HttpURLConnection) Urls.create(url, Urls.HTTP_PROTOCOLS, HostValidator.DENY_COMMON_INFRASTRUCTURE_TARGETS).openConnection();
             connection.setRequestMethod(method);
             connection.setRequestProperty("User-Agent", "kafka");
             connection.setRequestProperty("Accept", "application/json");
