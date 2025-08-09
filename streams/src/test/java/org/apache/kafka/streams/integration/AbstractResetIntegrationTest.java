@@ -16,6 +16,7 @@
  */
 package org.apache.kafka.streams.integration;
 
+import java.nio.file.Files;
 import org.apache.kafka.clients.CommonClientConfigs;
 import org.apache.kafka.clients.admin.Admin;
 import org.apache.kafka.clients.consumer.ConsumerConfig;
@@ -387,7 +388,7 @@ public abstract class AbstractResetIntegrationTest {
         final Map<String, Object> sslConfig = getClientSslConfig();
         if (sslConfig != null) {
             final File configFile = TestUtils.tempFile();
-            final BufferedWriter writer = new BufferedWriter(new FileWriter(configFile));
+            final BufferedWriter writer = Files.newBufferedWriter(configFile.toPath());
             writer.write(CommonClientConfigs.SECURITY_PROTOCOL_CONFIG + "=SSL\n");
             writer.write(SslConfigs.SSL_TRUSTSTORE_LOCATION_CONFIG + "=" + sslConfig.get(SslConfigs.SSL_TRUSTSTORE_LOCATION_CONFIG) + "\n");
             writer.write(SslConfigs.SSL_TRUSTSTORE_PASSWORD_CONFIG + "=" + ((Password) sslConfig.get(SslConfigs.SSL_TRUSTSTORE_PASSWORD_CONFIG)).value() + "\n");
